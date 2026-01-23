@@ -44,7 +44,8 @@
         "noUnknownAtRules": "off",
         "noEmptyBlock": "off",
         "noEmptyBlockStatements": "off",
-        "useAwait": "off"
+        "useAwait": "off",
+        "noBitwiseOperators": "off"
       },
       "performance": {
         "noNamespaceImport": "off",
