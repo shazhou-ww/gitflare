@@ -6,6 +6,7 @@ on:
       - reopened
       - synchronize
       - closed
+      - ready_for_review
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: false
@@ -45,6 +46,14 @@ jobs:
         with:
           node-version: "24"
           cache: pnpm
+      - &a4
+        name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
       - &a3
         name: Install dependencies
         shell: bash
@@ -57,7 +66,7 @@ jobs:
         run: pnpm test
   deploy-preview:
     needs: [ci]
-    if: ${{ github.event.action != 'closed' }}
+    if: ${{ github.event.action != 'closed' && !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     # Requires approval for external contributors (configured in repo Settings → Environments)
     environment: preview
@@ -71,6 +80,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - *a1
       - *a2
+      - *a4
       - *a3
       - name: Deploy Preview
         run: pnpm --filter ./apps/web run deploy
