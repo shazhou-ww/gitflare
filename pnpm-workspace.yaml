@@ -3,8 +3,8 @@ packages:
   - packages/*
 
 catalog:
-  alchemy: ^0.82.2
-  better-auth: ^1.4.9
+  alchemy: ^0.83.1
+  better-auth: ^1.4.17
   typescript: ^5.9.3
 
 onlyBuiltDependencies:

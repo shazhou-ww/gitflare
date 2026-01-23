@@ -189,7 +189,7 @@ export interface FileRoutesByFullPath {
   '/$owner/$repo/commits/$commitId': typeof OwnerRepoLayoutCommitsCommitIdRoute
   '/$owner/$repo/issues/$issueNumber': typeof OwnerRepoLayoutIssuesIssueNumberRoute
   '/$owner/$repo/issues/new': typeof OwnerRepoLayoutIssuesNewRoute
-  '/$owner/$repo/issues': typeof OwnerRepoLayoutIssuesIndexRoute
+  '/$owner/$repo/issues/': typeof OwnerRepoLayoutIssuesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -268,7 +268,7 @@ export interface FileRouteTypes {
     | '/$owner/$repo/commits/$commitId'
     | '/$owner/$repo/issues/$issueNumber'
     | '/$owner/$repo/issues/new'
-    | '/$owner/$repo/issues'
+    | '/$owner/$repo/issues/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -353,7 +353,7 @@ declare module '@tanstack/react-router' {
     '/_layout': {
       id: '/_layout'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof LayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -465,7 +465,7 @@ declare module '@tanstack/react-router' {
     '/$owner/$repo/_layout/issues/': {
       id: '/$owner/$repo/_layout/issues/'
       path: '/issues'
-      fullPath: '/$owner/$repo/issues'
+      fullPath: '/$owner/$repo/issues/'
       preLoaderRoute: typeof OwnerRepoLayoutIssuesIndexRouteImport
       parentRoute: typeof OwnerRepoLayoutRoute
     }
