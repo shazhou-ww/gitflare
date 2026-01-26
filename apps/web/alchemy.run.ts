@@ -22,6 +22,11 @@ const repoDO = DurableObjectNamespace("repos", {
   sqlite: true,
 });
 
+const hybridRepoDO = DurableObjectNamespace("hybrid-repos", {
+  className: "HybridRepo",
+  sqlite: true,
+});
+
 const db = await D1Database("gitflare-db", {
   name: "gitflare-db",
   migrationsDir: "./migrations",
@@ -43,6 +48,7 @@ function getCurrentUrl() {
 export const web = await TanStackStart("web", {
   bindings: {
     REPO: repoDO,
+    HYBRID_REPO: hybridRepoDO,
     DB: db,
     LOG_LEVEL: isProd ? "warn" : "debug",
     SITE_URL: getCurrentUrl(),
