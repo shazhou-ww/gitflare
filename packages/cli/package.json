@@ -1,6 +1,6 @@
 {
-  "name": "@gitflare/cli",
-  "version": "0.1.0",
+  "name": "@oc-forge/gf",
+  "version": "0.1.1",
   "type": "module",
   "description": "Gitflare CLI tool",
   "main": "./dist/index.js",

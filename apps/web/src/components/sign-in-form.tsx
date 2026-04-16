@@ -1,7 +1,9 @@
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
+import { getSessionOptions } from "@/api/session";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -15,6 +17,7 @@ import { Label } from "./ui/label";
 
 export default function SignInForm() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -31,6 +34,7 @@ export default function SignInForm() {
         });
 
         if (response.ok) {
+          await queryClient.invalidateQueries({ queryKey: getSessionOptions.queryKey });
           navigate({
             to: "/dashboard",
           });

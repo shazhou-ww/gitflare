@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { authLogin, authStatus } from './commands/auth.js'
 import { repoList, repoCreate, repoView, repoDelete } from './commands/repo.js'
 import { issueList, issueCreate, issueView, issueClose } from './commands/issue.js'
