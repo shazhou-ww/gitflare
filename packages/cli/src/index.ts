@@ -1,7 +1,11 @@
 import { authLogin, authStatus } from './commands/auth.js'
-import { repoList, repoCreate, repoView } from './commands/repo.js'
+import { repoList, repoCreate, repoView, repoDelete } from './commands/repo.js'
 import { issueList, issueCreate, issueView, issueClose } from './commands/issue.js'
 import { cloneRepo } from './commands/clone.js'
+import { branchList } from './commands/branch.js'
+import { commitList } from './commands/commit.js'
+import { commentList, commentCreate } from './commands/comment.js'
+import { treeList } from './commands/tree.js'
 
 // Simple argument parser
 class ArgParser {
@@ -74,6 +78,13 @@ Commands:
     -d, --description     Repository description
     --private             Make repository private
   repo view <owner/name>  View repository details
+  repo delete <owner/name> Delete a repository
+
+  branch list <owner/name>           List branches
+
+  commit list <owner/name>           List commits
+    --branch              Branch name (default: current branch)
+    --limit               Number of commits to show
 
   issue list <owner/name>           List issues
   issue create <owner/name>         Create a new issue
@@ -81,6 +92,13 @@ Commands:
     -b, --body            Issue body
   issue view <owner/name> <#number> View issue details
   issue close <owner/name> <#number> Close an issue
+
+  comment list <owner/name> <#number>      List issue comments
+  comment create <owner/name> <#number>    Create a comment
+    -b, --body            Comment body (required)
+
+  tree <owner/name> [path]          Browse file tree
+    --branch              Branch name (default: current branch)
 
   clone <owner/name> [dir]          Clone repository
 
@@ -92,8 +110,14 @@ Examples:
   gf auth login
   gf repo list scottwei
   gf repo create my-project -d "My awesome project"
+  gf repo delete xiaomo/old-project
+  gf branch list xiaomo/test-api
+  gf commit list xiaomo/test-api --branch main --limit 10
   gf issue list xiaomo/test-api
   gf issue create xiaomo/test-api -t "Bug report" -b "Something is broken"
+  gf comment list xiaomo/test-api 1
+  gf comment create xiaomo/test-api 1 -b "Thanks for reporting!"
+  gf tree xiaomo/test-api src --branch main
   gf clone xiaomo/test-api
 `)
 }
@@ -149,8 +173,15 @@ async function main() {
             }
             await repoView(rest[0], { json: jsonMode })
             break
+          case 'delete':
+            if (!rest[0]) {
+              console.error('Repository name is required (format: owner/name)')
+              process.exit(1)
+            }
+            await repoDelete(rest[0], { json: jsonMode })
+            break
           default:
-            console.error('Unknown repo command. Available: list, create, view')
+            console.error('Unknown repo command. Available: list, create, view, delete')
             process.exit(1)
         }
         break
@@ -193,6 +224,79 @@ async function main() {
             console.error('Unknown issue command. Available: list, create, view, close')
             process.exit(1)
         }
+        break
+
+      case 'branch':
+        switch (subcommand) {
+          case 'list':
+            if (!rest[0]) {
+              console.error('Repository name is required (format: owner/name)')
+              process.exit(1)
+            }
+            await branchList(rest[0], { json: jsonMode })
+            break
+          default:
+            console.error('Unknown branch command. Available: list')
+            process.exit(1)
+        }
+        break
+
+      case 'commit':
+        switch (subcommand) {
+          case 'list':
+            if (!rest[0]) {
+              console.error('Repository name is required (format: owner/name)')
+              process.exit(1)
+            }
+            await commitList(rest[0], {
+              branch: parser.get('branch') as string,
+              limit: parser.get('limit') as string,
+              json: jsonMode
+            })
+            break
+          default:
+            console.error('Unknown commit command. Available: list')
+            process.exit(1)
+        }
+        break
+
+      case 'comment':
+        switch (subcommand) {
+          case 'list':
+            if (!rest[0] || !rest[1]) {
+              console.error('Repository name and issue number are required')
+              process.exit(1)
+            }
+            await commentList(rest[0], rest[1], { json: jsonMode })
+            break
+          case 'create':
+            if (!rest[0] || !rest[1]) {
+              console.error('Repository name and issue number are required')
+              process.exit(1)
+            }
+            await commentCreate(rest[0], rest[1], {
+              body: parser.get('body') as string || parser.get('b') as string,
+              json: jsonMode
+            })
+            break
+          default:
+            console.error('Unknown comment command. Available: list, create')
+            process.exit(1)
+        }
+        break
+
+      case 'tree':
+        // For tree command, subcommand is actually the repo name
+        const treeRepoName = subcommand
+        const treePath = rest[0]
+        if (!treeRepoName) {
+          console.error('Repository name is required (format: owner/name)')
+          process.exit(1)
+        }
+        await treeList(treeRepoName, treePath, {
+          branch: parser.get('branch') as string,
+          json: jsonMode
+        })
         break
 
       case 'clone':

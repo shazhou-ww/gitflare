@@ -159,3 +159,46 @@ export async function repoView(ownerName: string, options: { json?: boolean } = 
     process.exit(1)
   }
 }
+
+export async function repoDelete(ownerName: string, options: { json?: boolean } = {}): Promise<void> {
+  try {
+    const config = await loadConfig()
+    if (!config.apiKey) {
+      if (options.json) {
+        console.log(JSON.stringify({ error: 'Not authenticated. Run `gf auth login` first.' }))
+      } else {
+        console.error('❌ Not authenticated. Run `gf auth login` first.')
+      }
+      process.exit(1)
+    }
+
+    const [owner, name] = ownerName.split('/')
+    if (!owner || !name) {
+      if (options.json) {
+        console.log(JSON.stringify({ error: 'Repository must be in format "owner/name"' }))
+      } else {
+        console.error('❌ Repository must be in format "owner/name"')
+      }
+      process.exit(1)
+    }
+
+    const api = createApi(config)
+    const response = await api.delete<ApiResponse<{ message: string }>>(`/repos/${owner}/${name}`)
+    const result = response.data
+
+    if (options.json) {
+      console.log(JSON.stringify(result))
+    } else {
+      console.log(`✅ Repository ${ownerName} deleted successfully`)
+    }
+  } catch (error) {
+    if (options.json) {
+      console.log(JSON.stringify({ 
+        error: error instanceof Error ? error.message : String(error) 
+      }))
+    } else {
+      console.error('Error:', error instanceof Error ? error.message : String(error))
+    }
+    process.exit(1)
+  }
+}

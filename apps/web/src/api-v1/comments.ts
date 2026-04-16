@@ -30,7 +30,34 @@ export async function handleComments(
       throw new ApiError("Invalid issue number", 400);
     }
 
-    if (method === "POST") {
+    if (method === "GET") {
+      // GET /api/v1/repos/:owner/:name/issues/:number/comments
+      const { Issue } = await import("@/db/issue");
+
+      const issueResult = await Issue.getByFullNameAndNumber({
+        fullName: `${owner}/${repo}`,
+        number: issueNumber,
+      });
+
+      const issue = issueResult.unwrapOrThrow({
+        DatabaseError: "Database error occurred while fetching issue.",
+        ValidationError: `Invalid owner or repository name (${owner}/${repo}) or number (${issueNumber}) provided.`,
+      });
+
+      if (!issue) {
+        throw new ApiError(
+          `Issue not found (${owner}/${repo}#${issueNumber})`,
+          404
+        );
+      }
+
+      const commentsResult = await Comment.getByIssueId({ issueId: issue.id });
+      const comments = commentsResult.unwrapOrThrow({
+        DatabaseError: "Database error occurred while fetching comments.",
+      });
+
+      return createSuccessResponse(comments);
+    } else if (method === "POST") {
       // POST /api/v1/repos/:owner/:name/issues/:number/comments
       const { user } = await verifyApiKey(request);
 

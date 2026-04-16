@@ -5,6 +5,7 @@ import { handleCommits } from "./commits";
 import { handleIssues } from "./issues";
 import { handleRepos } from "./repos";
 import { handleBlob, handleTree } from "./tree";
+import { handleTokenLogin } from "./token-login";
 
 export async function handleApiV1(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -20,6 +21,10 @@ export async function handleApiV1(request: Request): Promise<Response> {
 
   try {
     // Route to appropriate handlers
+    if (pathParts[0] === "auth" && pathParts[1] === "token-login") {
+      return handleTokenLogin(request);
+    }
+    
     if (pathParts[0] === "repos") {
       // Remove 'repos' from path parts
       const repoPathParts = pathParts.slice(1);

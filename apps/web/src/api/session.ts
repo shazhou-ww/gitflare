@@ -20,4 +20,7 @@ export const getSessionOptions = queryOptions({
     const data = await getSessionFn();
     return data;
   },
+  retry: false,
+  staleTime: 5 * 60 * 1000,
+  refetchOnWindowFocus: false,
 });

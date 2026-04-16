@@ -129,6 +129,34 @@ export async function handleRepos(
       });
 
       return createSuccessResponse(updatedRepo);
+    } else if (method === "DELETE" && pathParts.length === 2) {
+      // DELETE /api/v1/repos/:owner/:name
+      const { user } = await verifyApiKey(request);
+
+      const [owner, name] = pathParts;
+      
+      const repoResult = await Repo.getByOwnerAndName({ owner, name });
+      const repo = repoResult.unwrapOrThrow({
+        DatabaseError: "Database error occurred while fetching repository.",
+      });
+
+      if (!repo) {
+        throw new ApiError("Repository not found", 404);
+      }
+
+      if (repo.ownerId !== user.id) {
+        throw new ApiError(
+          "You do not have permission to delete this repository",
+          403
+        );
+      }
+
+      const deleteResult = await Repo.remove({ id: repo.id });
+      deleteResult.unwrapOrThrow({
+        DatabaseError: "Database error occurred while deleting repository.",
+      });
+
+      return createSuccessResponse({ message: "Repository deleted successfully" });
     }
 
     throw new ApiError("Method not allowed", 405);
