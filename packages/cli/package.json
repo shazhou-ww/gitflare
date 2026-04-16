@@ -1,0 +1,27 @@
+{
+  "name": "@gitflare/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Gitflare CLI tool",
+  "main": "./dist/index.js",
+  "bin": {
+    "gf": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

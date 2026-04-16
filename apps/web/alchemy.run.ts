@@ -6,15 +6,16 @@ import {
   Worker,
 } from "alchemy/cloudflare";
 import { GitHubComment } from "alchemy/github";
-import { CloudflareStateStore } from "alchemy/state";
+import { FileSystemStateStore } from "alchemy/state";
 
-const PROD_DOMAIN = "gitflare.mdhruvil.com";
+const PROD_DOMAIN = "git.shazhou.work";
 
 const LOCAL_URL = "http://localhost:3000";
 const PROD_URL = `https://${PROD_DOMAIN}`;
 
 const app = await alchemy("gitflare", {
-  stateStore: (scope) => new CloudflareStateStore(scope),
+  stateStore: (scope) => new FileSystemStateStore(scope),
+  password: process.env.ALCHEMY_PASSWORD ?? "gitflare-shazhou-2026",
 });
 
 const repoDO = DurableObjectNamespace("repos", {

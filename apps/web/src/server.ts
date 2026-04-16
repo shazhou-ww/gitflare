@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/cloudflare";
 import handler from "@tanstack/react-start/server-entry";
+import { handleApiV1 } from "./api-v1/router";
 
 export default Sentry.withSentry(
   () => ({
@@ -14,6 +15,13 @@ export default Sentry.withSentry(
   {
     async fetch(req) {
       try {
+        const url = new URL(req.url);
+
+        // Intercept API v1 requests
+        if (url.pathname.startsWith("/api/v1/")) {
+          return await handleApiV1(req);
+        }
+
         return await handler.fetch(req);
       } catch (error) {
         Sentry.captureException(error);
