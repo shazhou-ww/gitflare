@@ -34,11 +34,12 @@ export default function SignInForm() {
         });
 
         if (response.ok) {
-          await queryClient.invalidateQueries({ queryKey: getSessionOptions.queryKey });
+          // Refetch session so cache is warm before navigation
+          await queryClient.refetchQueries({ queryKey: getSessionOptions.queryKey });
+          toast.success("Sign in successful");
           navigate({
             to: "/dashboard",
           });
-          toast.success("Sign in successful");
         } else {
           const errorData = await response.json() as { error?: string };
           toast.error(errorData.error || "Login failed");
