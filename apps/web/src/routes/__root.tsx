@@ -8,7 +8,12 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { lazy } from "react";
+
+// DevTools only in development
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(() => import("@tanstack/react-router-devtools").then(m => ({ default: m.TanStackRouterDevtools })))
+  : () => null;
 import { LoaderIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getSessionOptions } from "@/api/session";
@@ -126,10 +131,6 @@ function RootDocument() {
             style={{
               background:
                 "radial-gradient(closest-side, rgba(0,10,40,0.2) 0%, rgba(0,0,0,0) 100%)",
-              maskImage:
-                "radial-gradient(ellipse 70% 75% at 50% 40%, black 60%, transparent 80%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse 70% 75% at 50% 40%, black 60%, transparent 80%)",
             }}
           >
             <div
